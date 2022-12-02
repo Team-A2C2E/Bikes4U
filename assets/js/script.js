@@ -25,7 +25,7 @@ function getUserCoordinates() {
 }
 
 function requestStations() {
-  let requestURL = "http://api.citybik.es/v2/networks/divvy";
+  let requestURL = "https://api.citybik.es/v2/networks/divvy";
   fetch(requestURL)
     .then(function (response) {
       return response.json();
