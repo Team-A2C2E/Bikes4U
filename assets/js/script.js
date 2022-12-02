@@ -4,25 +4,26 @@ let userCoordinates = document.querySelector("#user-coordinates");
 let stationCards = document.querySelector("#station-cards");
 let stationArray = [];
 let closestStations = [];
+letuserAnswers =
 
-function getUserCoordinates() {
-  const options = {
-    enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0,
-  };
-  function success(pos) {
-    const crd = pos.coords;
+  function getUserCoordinates() {
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    };
+    function success(pos) {
+      const crd = pos.coords;
 
-    userCoordinates.innerHTML = `<div>Latitude : ${crd.latitude}</div>`;
-    userCoordinates.innerHTML += `<div>Longitude : ${crd.longitude}</div>`;
+      userCoordinates.innerHTML = `<div>Latitude : ${crd.latitude}</div>`;
+      userCoordinates.innerHTML += `<div>Longitude : ${crd.longitude}</div>`;
+    }
+    function error(err) {
+      console.warn(`ERROR(${err.code}): ${err.message}`);
+    }
+
+    navigator.geolocation.getCurrentPosition(success, error, options);
   }
-  function error(err) {
-    console.warn(`ERROR(${err.code}): ${err.message}`);
-  }
-
-  navigator.geolocation.getCurrentPosition(success, error, options);
-}
 
 function requestStations() {
   let requestURL = "https://api.citybik.es/v2/networks/divvy";
@@ -87,13 +88,31 @@ function displayResults() {
                     <div>Empty Slots: ${station.empty}</div><div>Renting: ${station.renting}</div><div>Free Bikes: ${station.freeBikes}</div><div>Total Slots: ${station.slots}</div>
                 </div>
             </div>
-        </div>`;
+            <div class="flex-wrap flex" id="${station.name}">
+
+            </div>
+            </div>`;
+    if (1 === 1) {
+
+      for (let i = 0; i < station.slots; i++) {
+        let bikeSlotDiv = document.getElementById(station.name)
+        let bikeImage = document.createElement("img");
+        bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
+        bikeImage.setAttribute("alt", "empty slot");
+        bikeImage.setAttribute("class", " h-5 w-5");
+        console.log(bikeImage, station.slots, station.name);
+        bikeSlotDiv.appendChild(bikeImage);
+      }
+    } else if (1 === 0) {
+      [];
+    }
   });
   console.log(stationArray);
   //display results
 
   //createEL
 }
+
 
 function init() {
   requestStations();
