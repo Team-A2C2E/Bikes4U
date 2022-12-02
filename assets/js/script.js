@@ -87,13 +87,26 @@ function displayResults() {
                     <div>Empty Slots: ${station.empty}</div><div>Renting: ${station.renting}</div><div>Free Bikes: ${station.freeBikes}</div><div>Total Slots: ${station.slots}</div>
                 </div>
             </div>
-        </div>`;
+            <div class="flex-wrap flex" id="${station.name}">
+
+            </div>
+            </div>`;
+    for (let i = 0; i < station.slots; i++) {
+      let bikeSlotDiv = document.getElementById(station.name)
+      let bikeImage = document.createElement("img");
+      bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
+      bikeImage.setAttribute("alt", "empty slot");
+      bikeImage.setAttribute("class", " h-5 w-5");
+      console.log(bikeImage, station.slots, station.name);
+      bikeSlotDiv.appendChild(bikeImage);
+    }
   });
   console.log(stationArray);
   //display results
 
   //createEL
 }
+
 
 function init() {
   requestStations();
