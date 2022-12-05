@@ -4,7 +4,7 @@ let userCoordinates = document.querySelector("#user-coordinates");
 let stationCards = document.querySelector("#station-cards");
 let stationArray = [];
 let closestStations = [];
-let userAnswers = document.querySelector("#question-div")
+let userAnswers = document.querySelector("#question-div");
 
 function getUserCoordinates() {
   const options = {
@@ -78,27 +78,68 @@ function displayResults() {
   // Adding each Station to its own Div
   closestStations.forEach((station) => {
     stationCards.innerHTML += ` 
-        <div class="my-4 flex flex-col">
+        <div class="my-4 flex flex-col p-2">
             <div class="justify-center flex bg-gray-400 font-bold text-lg text-[#4c0473]">${station.name}</div>
             <div class="bg-[#4c0473] p-4 flex justify-around text-white ">
                 <div class="">
                     <div>City: ${station.city}</div><div>Distance: ${station.distance.toFixed(2)} Miles</div>
                 </div>
                 <div>
-                    <div>Empty Slots: ${station.empty}</div><div>Renting: ${station.renting}</div><div>Free Bikes: ${station.freeBikes}</div><div>Total Slots: ${station.slots}</div>
+                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4">ADD AS FAVORITE</button>
                 </div>
             </div>
-            <div class="flex-wrap flex bg-[#FAA6FF]" id="${station.name}">
-
+            <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
+                  <div>
+                        <div class="flex-wrap flex justify-center" id="${station.name}div1Head"></div>
+                        <div class="flex-wrap flex bg-[#FAA6FF] justify-center p-3" id="${station.name}div1"></div>
+                  </div>
+                  <div>
+                        <div class="flex-wrap flex justify-center" id="${station.name}div2Head"></div>
+                        <div class="flex-wrap flex bg-[#FAA6FF] justify-center p-3" id="${station.name}div2"></div>
+                  </div>
+                  <div>
+                        <div class="flex-wrap flex justify-center" id="${station.name}div3Head"></div>
+                        <div class="flex-wrap flex bg-[#FAA6FF] justify-center p-3" id="${station.name}div3"></div>
+                  </div>
             </div>
-            </div>`;
+        </div>`;
     if (1 === 1) {
-      for (let i = 0; i < station.slots; i++) {
-        let bikeSlotDiv = document.getElementById(station.name)
+      if (station.empty !== 0) {
+        let bikeSlotDiv1Head = document.getElementById(`${station.name}div1Head`);
+        bikeSlotDiv1Head.innerHTML = `<h3 class="text-white w-full text-center">EMPTY SLOTS</h3>`;
+      }
+      if (station.renting !== 0) {
+        let bikeSlotDiv2Head = document.getElementById(`${station.name}div2Head`);
+        bikeSlotDiv2Head.innerHTML = `<h3 class="text-white w-full text-center">RENTING BIKES</h3>`;
+      }
+      if (station.freeBikes !== 0) {
+        let bikeSlotDiv3Head = document.getElementById(`${station.name}div3Head`);
+        bikeSlotDiv3Head.innerHTML = `<h3 class="text-white w-full text-center">BIKES AVAILABLE</h3>`;
+      }
+      for (let i = 0; i < station.empty; i++) {
+        let bikeSlotDiv = document.getElementById(`${station.name}div1`);
+        let bikeImage = document.createElement("img");
+        bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
+        bikeImage.setAttribute("alt", "empty slot");
+        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+        console.log(bikeImage, station.slots, station.name);
+        bikeSlotDiv.appendChild(bikeImage);
+      }
+      for (let i = 0; i < station.renting; i++) {
+        let bikeSlotDiv = document.getElementById(`${station.name}div2`);
+        let bikeImage = document.createElement("img");
+        bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
+        bikeImage.setAttribute("alt", "renting bikes");
+        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+        console.log(bikeImage, station.slots, station.name);
+        bikeSlotDiv.appendChild(bikeImage);
+      }
+      for (let i = 0; i < station.freeBikes; i++) {
+        let bikeSlotDiv = document.getElementById(`${station.name}div3`);
         let bikeImage = document.createElement("img");
         bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
-        bikeImage.setAttribute("alt", "empty slot");
-        bikeImage.setAttribute("class", " h-5 w-5");
+        bikeImage.setAttribute("alt", "free bikes");
+        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
         console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
       }
@@ -111,7 +152,6 @@ function displayResults() {
 
   //createEL
 }
-
 
 function init() {
   requestStations();
