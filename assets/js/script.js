@@ -1,5 +1,5 @@
 //global
-
+let crd = {}
 let userCoordinates = document.querySelector("#user-coordinates");
 let stationCards = document.querySelector("#station-cards");
 let favoriteDiv = document.querySelector("#favorite-div");
@@ -15,7 +15,7 @@ function getUserCoordinates() {
     maximumAge: 0,
   };
   function success(pos) {
-    const crd = pos.coords;
+    crd = pos.coords;
 
     userCoordinates.innerHTML = `<div>Latitude : ${crd.latitude}</div>`;
     userCoordinates.innerHTML += `<div>Longitude : ${crd.longitude}</div>`;
@@ -40,7 +40,7 @@ function requestStations() {
         maximumAge: 0,
       };
       function success(pos) {
-        const crd = pos.coords;
+         crd = pos.coords;
 
         userCoordinates.innerHTML = `<div>Latitude : ${crd.latitude}</div>`;
         userCoordinates.innerHTML += `<div>Longitude : ${crd.longitude}</div>`;
@@ -56,7 +56,9 @@ function requestStations() {
           stationObject.freeBikes = data.network.stations[i].free_bikes;
           stationObject.returning = data.network.stations[i].extra.returning;
           stationObject.extraSlot = data.network.stations[i].extra.slots;
-          stationObject.distance = 3963.0 * Math.acos(Math.sin(crd.latitude / (180 / Math.PI)) * Math.sin(data.network.stations[i].latitude / (180 / Math.PI)) + Math.cos(crd.latitude / (180 / Math.PI)) * Math.cos(data.network.stations[i].latitude / (180 / Math.PI)) * Math.cos(data.network.stations[i].longitude / (180 / Math.PI) - crd.longitude / (180 / Math.PI)));
+          stationObject.latitude = data.network.stations[i].latitude;
+          stationObject.longitude = data.network.stations[i].longitude;
+          stationObject.distance = 3963.0 * Math.acos(Math.sin(crd.latitude / (180 / Math.PI)) * Math.sin(stationObject.latitude / (180 / Math.PI)) + Math.cos(crd.latitude / (180 / Math.PI)) * Math.cos(stationObject.latitude / (180 / Math.PI)) * Math.cos(stationObject.longitude / (180 / Math.PI) - crd.longitude / (180 / Math.PI)));
           if (stationObject.name.includes("Public", 0) === false) {
             stationArray.push(stationObject);
           }
@@ -67,7 +69,7 @@ function requestStations() {
 
         // LAST STEP FOR DISPLAY
         closestStations = stationArray.slice(0, 10);
-        displayResults();
+        displayResults(crd);
       }
       function error(err) {
         console.warn(`ERROR(${err.code}): ${err.message}`);
@@ -76,7 +78,8 @@ function requestStations() {
       navigator.geolocation.getCurrentPosition(success, error, options);
     });
 }
-function displayResults() {
+function displayResults(current) {
+  console.log("crd", current)
   // Adding each Station to its own Div
   closestStations.forEach((station) => {
     stationCards.innerHTML += ` 
@@ -87,8 +90,8 @@ function displayResults() {
                     <div>City: ${station.city}</div><div>Distance: ${station.distance.toFixed(2)} Miles</div>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" data-station="${station.name}">ADD AS FAVORITE</button>
-                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4">NAVIGATE</button>
+                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
+                    <a target="_parent" class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" href="https://www.google.com/maps/dir/${current.latitude},+${current.longitude}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}">NAVIGATE</a>
                 </div>
             </div>
             <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
@@ -159,18 +162,36 @@ function displayResults() {
   //createEL
 }
 function addFavorite(station) {
+  
   favoriteStations.unshift(station);
   favoriteStations = favoriteStations.slice(0, 5);
   localStorage.setItem("favoriteStations", JSON.stringify(favoriteStations));
 }
 
 function loadFavorites() {
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0,
+  };
+  function success(pos) {
+    crd = pos.coords;
+  
   favoriteStations.forEach((station) => {
-    let favoriteStationEL = document.createElement("div");
+    let favoriteStationEL = document.createElement("a");
     favoriteStationEL.setAttribute("class", " h-6 w-6 mx-1 flex");
-    favoriteStationEL.innerHTML = station;
+    favoriteStationEL.setAttribute("href", `https://www.google.com/maps/dir/${crd.latitude},+${crd.longitude}/${station.lat},+${station.long}/@${station.lat},${station.long}`);
+
+    favoriteStationEL.setAttribute("data-lat", station.lat);
+    favoriteStationEL.setAttribute("data-long", station.long);
+    favoriteStationEL.innerHTML = station.name;
     favoriteDiv.appendChild(favoriteStationEL);
   });
+}
+function error(err) {
+  console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+navigator.geolocation.getCurrentPosition(success, error, options);
 }
 
 function init() {
@@ -181,14 +202,17 @@ function init() {
 }
 
 init();
-
+let stationName = {};
 //event listeners
 stationCards.addEventListener("click", function (event) {
   event.preventDefault();
   console.log(event.target.getAttribute("data-station"));
-  let stationNameEL = event.target.getAttribute("data-station");
-  if (stationNameEL !== null) {
-    addFavorite(stationNameEL);
+  // let stationNameEL = event.target.getAttribute("data-station");
+  stationName.name = event.target.getAttribute("data-station");
+  stationName.lat = event.target.getAttribute("data-lat")
+  stationName.long = event.target.getAttribute("data-long")
+  if (stationName !== null) {
+    addFavorite(stationName);
   }
 });
 //anser the cards
