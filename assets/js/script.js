@@ -2,9 +2,11 @@
 
 let userCoordinates = document.querySelector("#user-coordinates");
 let stationCards = document.querySelector("#station-cards");
+let favoriteDiv = document.querySelector("#favorite-div");
 let stationArray = [];
 let closestStations = [];
 let userAnswers = document.querySelector("#question-div");
+let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
 
 function getUserCoordinates() {
   const options = {
@@ -85,7 +87,7 @@ function displayResults() {
                     <div>City: ${station.city}</div><div>Distance: ${station.distance.toFixed(2)} Miles</div>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4">ADD AS FAVORITE</button>
+                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" data-station="${station.name}">ADD AS FAVORITE</button>
                     <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4">NAVIGATE</button>
                 </div>
             </div>
@@ -123,7 +125,7 @@ function displayResults() {
         bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
         bikeImage.setAttribute("alt", "empty slot");
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        console.log(bikeImage, station.slots, station.name);
+        // console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
@@ -133,7 +135,7 @@ function displayResults() {
         bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
         bikeImage.setAttribute("alt", "renting bikes");
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        console.log(bikeImage, station.slots, station.name);
+        // console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
@@ -143,7 +145,7 @@ function displayResults() {
         bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
         bikeImage.setAttribute("alt", "free bikes");
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        console.log(bikeImage, station.slots, station.name);
+        // console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
@@ -156,9 +158,24 @@ function displayResults() {
 
   //createEL
 }
+function addFavorite(station) {
+  favoriteStations.unshift(station);
+  favoriteStations = favoriteStations.slice(0, 5);
+  localStorage.setItem("favoriteStations", JSON.stringify(favoriteStations));
+}
+
+function loadFavorites() {
+  favoriteStations.forEach((station) => {
+    let favoriteStationEL = document.createElement("div");
+    favoriteStationEL.setAttribute("class", " h-6 w-6 mx-1 flex");
+    favoriteStationEL.innerHTML = station;
+    favoriteDiv.appendChild(favoriteStationEL);
+  });
+}
 
 function init() {
   requestStations();
+  loadFavorites();
   //show favorites
   //display 10 stations
 }
@@ -166,4 +183,12 @@ function init() {
 init();
 
 //event listeners
+stationCards.addEventListener("click", function (event) {
+  event.preventDefault();
+  console.log(event.target.getAttribute("data-station"));
+  let stationNameEL = event.target.getAttribute("data-station");
+  if (stationNameEL !== null) {
+    addFavorite(stationNameEL);
+  }
+});
 //anser the cards
