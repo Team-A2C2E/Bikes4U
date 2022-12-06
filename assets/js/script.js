@@ -91,15 +91,15 @@ function displayResults() {
             <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
                   <div>
                         <div class="flex-wrap flex justify-center" id="${station.name}div1Head"></div>
-                        <div class="flex-wrap flex bg-[#FAA6FF] justify-center p-3" id="${station.name}div1"></div>
+                        <div id="${station.name}div1"></div>
                   </div>
                   <div>
                         <div class="flex-wrap flex justify-center" id="${station.name}div2Head"></div>
-                        <div class="flex-wrap flex bg-[#FAA6FF] justify-center p-3" id="${station.name}div2"></div>
+                        <div id="${station.name}div2"></div>
                   </div>
                   <div>
                         <div class="flex-wrap flex justify-center" id="${station.name}div3Head"></div>
-                        <div class="flex-wrap flex bg-[#FAA6FF] justify-center p-3" id="${station.name}div3"></div>
+                        <div id="${station.name}div3"></div>
                   </div>
             </div>
         </div>`;
@@ -124,6 +124,7 @@ function displayResults() {
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
         console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
+        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
       for (let i = 0; i < station.renting; i++) {
         let bikeSlotDiv = document.getElementById(`${station.name}div2`);
@@ -133,6 +134,7 @@ function displayResults() {
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
         console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
+        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
       for (let i = 0; i < station.freeBikes; i++) {
         let bikeSlotDiv = document.getElementById(`${station.name}div3`);
@@ -142,6 +144,7 @@ function displayResults() {
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
         console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
+        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
     } else if (1 === 0) {
       [];
