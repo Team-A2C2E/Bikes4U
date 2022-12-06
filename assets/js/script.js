@@ -84,8 +84,9 @@ function displayResults() {
                 <div class="">
                     <div>City: ${station.city}</div><div>Distance: ${station.distance.toFixed(2)} Miles</div>
                 </div>
-                <div>
+                <div class="flex flex-col gap-2">
                     <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4">ADD AS FAVORITE</button>
+                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4">NAVIGATE</button>
                 </div>
             </div>
             <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
