@@ -1,5 +1,7 @@
 //global
-let crd = {}
+let crd = {};
+let userLatitude = [];
+let userLongitude = [];
 let userCoordinates = document.querySelector("#user-coordinates");
 let stationCards = document.querySelector("#station-cards");
 let favoriteDiv = document.querySelector("#favorite-div");
@@ -8,25 +10,12 @@ let closestStations = [];
 let userAnswers = document.querySelector("#question-div");
 let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
 
-function getUserCoordinates() {
-  const options = {
-    enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0,
-  };
-  function success(pos) {
-    crd = pos.coords;
-
-    userCoordinates.innerHTML = `<div>Latitude : ${crd.latitude}</div>`;
-    userCoordinates.innerHTML += `<div>Longitude : ${crd.longitude}</div>`;
-  }
-  function error(err) {
-    console.warn(`ERROR(${err.code}): ${err.message}`);
-  }
-
-  navigator.geolocation.getCurrentPosition(success, error, options);
+function pullUserCoordinates() {
+  userCoordinates.innerHTML = `<div><div>Latitude</div><div id="userLatitude">${crd.latitude}</div></div>`;
+  userCoordinates.innerHTML += `<div><div>Latitude</div><div id="userLongitude">${crd.longitude}</div></div>`;
+  userLatitude = document.querySelector("#userLatitude");
+  userLongitude = document.querySelector("#userLongitude");
 }
-
 function requestStations() {
   let requestURL = "https://api.citybik.es/v2/networks/divvy";
   fetch(requestURL)
@@ -36,14 +25,16 @@ function requestStations() {
     .then(function (data) {
       const options = {
         enableHighAccuracy: true,
-        timeout: 5000,
+        timeout: 10000,
         maximumAge: 0,
       };
       function success(pos) {
-         crd = pos.coords;
+        crd = pos.coords;
 
-        userCoordinates.innerHTML = `<div>Latitude : ${crd.latitude}</div>`;
-        userCoordinates.innerHTML += `<div>Longitude : ${crd.longitude}</div>`;
+        userCoordinates.innerHTML = `<div><div>Latitude</div><div id="userLatitude">${crd.latitude}</div></div>`;
+        userCoordinates.innerHTML += `<div><div>Latitude</div><div id="userLongitude">${crd.longitude}</div></div>`;
+        userLatitude = document.querySelector("#userLatitude");
+        userLongitude = document.querySelector("#userLongitude");
 
         console.log(data.network);
         for (let i = 0; i < data.network.stations.length; i++) {
@@ -78,8 +69,7 @@ function requestStations() {
       navigator.geolocation.getCurrentPosition(success, error, options);
     });
 }
-function displayResults(current) {
-  console.log("crd", current)
+function displayResults() {
   // Adding each Station to its own Div
   closestStations.forEach((station) => {
     stationCards.innerHTML += ` 
@@ -91,7 +81,7 @@ function displayResults(current) {
                 </div>
                 <div class="flex flex-col gap-2">
                     <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
-                    <a target="_parent" class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" href="https://www.google.com/maps/dir/${current.latitude},+${current.longitude}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}">NAVIGATE</a>
+                    <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
                 </div>
             </div>
             <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
@@ -128,7 +118,6 @@ function displayResults(current) {
         bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
         bikeImage.setAttribute("alt", "empty slot");
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        // console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
@@ -138,7 +127,6 @@ function displayResults(current) {
         bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
         bikeImage.setAttribute("alt", "renting bikes");
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        // console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
@@ -148,13 +136,13 @@ function displayResults(current) {
         bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
         bikeImage.setAttribute("alt", "free bikes");
         bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        // console.log(bikeImage, station.slots, station.name);
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
     } else if (1 === 0) {
       [];
     }
+    loadFavorites();
   });
   console.log(stationArray);
   //display results
@@ -162,25 +150,24 @@ function displayResults(current) {
   //createEL
 }
 function addFavorite(station) {
-  
-  favoriteStations.unshift(station);
-  favoriteStations = favoriteStations.slice(0, 5);
-  localStorage.setItem("favoriteStations", JSON.stringify(favoriteStations));
+  let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
+  console.log(favoriteStations.includes(station));
+  console.log(favoriteStations);
+  const findStation = favoriteStations.find((st) => st.name === station.name) || [];
+  console.log(findStation);
+  if (findStation.length === 0) {
+    favoriteStations.unshift(station);
+    favoriteStations = favoriteStations.slice(0, 5);
+    localStorage.setItem("favoriteStations", JSON.stringify(favoriteStations));
+  }
 }
 
 function loadFavorites() {
-  const options = {
-    enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0,
-  };
-  function success(pos) {
-    crd = pos.coords;
-  
+  favoriteDiv.innerHTML = `<h3 class="text-center text-[#4c0473]">FAVORITE LOCATIONS</h3>`;
   favoriteStations.forEach((station) => {
     let favoriteStationEL = document.createElement("a");
-    favoriteStationEL.setAttribute("class", " h-6 w-6 mx-1 flex");
-    favoriteStationEL.setAttribute("href", `https://www.google.com/maps/dir/${crd.latitude},+${crd.longitude}/${station.lat},+${station.long}/@${station.lat},${station.long}`);
+    favoriteStationEL.setAttribute("class", " w-5/6 p-2 bg-[#4c0473] flex my-2 m-auto");
+    favoriteStationEL.setAttribute("href", `https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.lat},+${station.long}/@${station.lat},${station.long}`);
 
     favoriteStationEL.setAttribute("data-lat", station.lat);
     favoriteStationEL.setAttribute("data-long", station.long);
@@ -188,15 +175,9 @@ function loadFavorites() {
     favoriteDiv.appendChild(favoriteStationEL);
   });
 }
-function error(err) {
-  console.warn(`ERROR(${err.code}): ${err.message}`);
-}
-navigator.geolocation.getCurrentPosition(success, error, options);
-}
 
 function init() {
   requestStations();
-  loadFavorites();
   //show favorites
   //display 10 stations
 }
@@ -207,11 +188,10 @@ let stationName = {};
 stationCards.addEventListener("click", function (event) {
   event.preventDefault();
   console.log(event.target.getAttribute("data-station"));
-  // let stationNameEL = event.target.getAttribute("data-station");
   stationName.name = event.target.getAttribute("data-station");
-  stationName.lat = event.target.getAttribute("data-lat")
-  stationName.long = event.target.getAttribute("data-long")
-  if (stationName !== null) {
+  stationName.lat = event.target.getAttribute("data-lat");
+  stationName.long = event.target.getAttribute("data-long");
+  if (stationName.name !== null) {
     addFavorite(stationName);
   }
 });
