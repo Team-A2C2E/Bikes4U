@@ -24,13 +24,28 @@
             <div class="bg-[#7353BA] border-2 border-red-700 h-1/6 text-white" id="user-coordinates"></div>
             <!-- search button -->
             <!-- list of favorites -->
-            <div class="bg-[#EFC3F5] border-2 border-red-700 h-5/6 text-white" id="favorite-div">FAVORITES HERE</div>
+            <div class="bg-[#EFC3F5] border-2 border-red-700 h-5/6 text-white justify-center" id="favorite-div">
+                FAVORITES HERE</div>
         </div>
         <!-- /form -->
 
         <!-- Output Div -->
         <!-- question cards -->
-        <div class="" id="question-div"></div>
+        <div class="absolute object-center w-4/5 h-80 bg-white flex" id="question-div">
+            <div class="m-auto block" id="question-one">
+                <p class="justify-center">What are you doing?</p>
+                <div class="flex justify-center gap-2">
+                    <input name="choice" type="radio" value="freeBikes" class="p-2 border-2 border-[#4c0473]"
+                        id="renting-btn">Renting
+                    <input name="choice" type="radio" value="empty" class="p-2 border-2 border-[#4c0473]"
+                        id="returning-btn">Returning
+                </div>
+                <div class="flex justify-center gap-2">
+                    <input type="text" placeholder="1-4 bikes" class="border-2 border-[#4c0473]" id="num-bike">
+                    <button class="p-2 border-2 border-[#4c0473]" id="enter-btn">Enter</button>
+                </div>
+            </div>
+        </div>
         <!-- output cards-->
         <!-- API Info -->
         <div class="w-3/5" id="station-cards"></div>
