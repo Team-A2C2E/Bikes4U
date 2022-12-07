@@ -13,7 +13,9 @@ let enterBtn = document.querySelector("#enter-btn");
 let rentingBtn = document.querySelector("#renting-btn");
 let returningBtn = document.querySelector("#returning-btn");
 let numberBikes = document.getElementById("num-bike");
-
+let questionDiv = document.querySelector("#question-div");
+let searchAgainButton = "";
+let leftSide = document.querySelector("#left-side");
 let isRenting = false;
 let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
 let numBikes = 0;
@@ -39,13 +41,14 @@ function requestStations() {
       };
       function success(pos) {
         crd = pos.coords;
+        questionDiv.setAttribute("class", "absolute object-center w-4/5 h-80 bg-white flex block");
 
         userCoordinates.innerHTML = `<div><div>Latitude</div><div id="userLatitude">${crd.latitude}</div></div>`;
         userCoordinates.innerHTML += `<div><div>Latitude</div><div id="userLongitude">${crd.longitude}</div></div>`;
+        userCoordinates.innerHTML += `<button id="search-again-button" class="w-5/6 bg-[#4c0473] p-4 justify-center">SEARCH AGAIN?</button>`;
         userLatitude = document.querySelector("#userLatitude");
         userLongitude = document.querySelector("#userLongitude");
 
-        console.log(data.network);
         for (let i = 0; i < data.network.stations.length; i++) {
           let stationObject = {};
           stationObject.name = data.network.stations[i].name;
@@ -85,13 +88,13 @@ function displayResults() {
       console.log(station);
     }
   });
-  console.log(stationArrayFiltered);
+
   closestStations = stationArrayFiltered.slice(0, 10);
 
   // Adding each Station to its own Div
   closestStations.forEach((station) => {
     stationCards.innerHTML += ` 
-        <div class="my-4 flex flex-col p-2">
+        <div class="flex flex-col px-2 mb-4">
             <div class="justify-center flex bg-gray-400 font-bold text-lg text-[#4c0473]">${station.name}</div>
             <div class="bg-[#4c0473] p-4 flex justify-around text-white ">
                 <div class="">
@@ -99,7 +102,7 @@ function displayResults() {
                 </div>
                 <div class="flex flex-col gap-2">
                     <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
-                    <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
+                    <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4 text-center" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
                 </div>
             </div>
             <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
@@ -117,6 +120,7 @@ function displayResults() {
                   </div>
             </div>
         </div>`;
+
     if (isRenting === false) {
       if (station.empty !== 0) {
         let bikeSlotDiv1Head = document.getElementById(`${station.name}div1Head`);
@@ -207,10 +211,9 @@ function displayResults() {
 }
 function addFavorite(station) {
   favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
-  console.log(favoriteStations.includes(station));
-  console.log(favoriteStations);
+
   const findStation = favoriteStations.find((st) => st.name === station.name) || [];
-  console.log(findStation);
+
   if (findStation.length === 0) {
     favoriteStations.unshift(station);
     favoriteStations = favoriteStations.slice(0, 5);
@@ -238,7 +241,7 @@ function runFilter() {
     isRenting = true;
     bikeType = "freeBikes";
     numBikes = numberBikes.value;
-    console.log(numBikes);
+
     displayResults();
   } else if (returningBtn.checked === true) {
     isRenting = false;
@@ -247,6 +250,16 @@ function runFilter() {
     displayResults();
   } else {
     alert("check something");
+  }
+  questionDiv.setAttribute("class", "absolute object-center w-4/5 h-80 bg-white flex hidden");
+  leftSide.setAttribute("class", "flex flex-col w-1/5 mb-4 block");
+}
+
+function searchAgain(event) {
+  if (event.target.tagName.toLowerCase() === "button") {
+    questionDiv.setAttribute("class", "absolute object-center w-4/5 h-80 bg-white flex block");
+    leftSide.setAttribute("class", "flex flex-col w-1/5 mb-4 hidden");
+    stationCards.innerHTML = "";
   }
 }
 
@@ -261,7 +274,7 @@ let stationName = {};
 //event listeners
 stationCards.addEventListener("click", function (event) {
   event.preventDefault();
-  console.log(event.target.getAttribute("data-station"));
+
   stationName.name = event.target.getAttribute("data-station");
   stationName.lat = event.target.getAttribute("data-lat");
   stationName.long = event.target.getAttribute("data-long");
@@ -271,4 +284,5 @@ stationCards.addEventListener("click", function (event) {
 });
 
 enterBtn.addEventListener("click", runFilter);
+userCoordinates.addEventListener("click", searchAgain);
 //anser the cards
