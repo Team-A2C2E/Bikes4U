@@ -10,10 +10,13 @@ let stationArray = [];
 let stationArrayFiltered = [];
 let closestStations = [];
 let enterBtn = document.querySelector("#enter-btn");
+let startSearchBtn = document.querySelector("#start-search-btn");
 let rentingBtn = document.querySelector("#renting-btn");
 let returningBtn = document.querySelector("#returning-btn");
 let numberBikes = document.getElementById("num-bike");
 let questionDiv = document.querySelector("#question-div");
+let errorDiv = document.querySelector("#error-div");
+
 let searchAgainButton = "";
 let leftSide = document.querySelector("#left-side");
 let isRenting = false;
@@ -21,12 +24,6 @@ let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [
 let numBikes = 0;
 let bikeType = "empty";
 
-function pullUserCoordinates() {
-  userCoordinates.innerHTML = `<div><div>Latitude</div><div id="userLatitude">${crd.latitude}</div></div>`;
-  userCoordinates.innerHTML += `<div><div>Latitude</div><div id="userLongitude">${crd.longitude}</div></div>`;
-  userLatitude = document.querySelector("#userLatitude");
-  userLongitude = document.querySelector("#userLongitude");
-}
 function requestStations() {
   let requestURL = "https://api.citybik.es/v2/networks/divvy";
   fetch(requestURL)
@@ -41,11 +38,11 @@ function requestStations() {
       };
       function success(pos) {
         crd = pos.coords;
-        questionDiv.setAttribute("class", "absolute object-center w-4/5 h-80 bg-white flex block");
+        questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex block");
 
-        userCoordinates.innerHTML = `<div><div>Latitude</div><div id="userLatitude">${crd.latitude}</div></div>`;
-        userCoordinates.innerHTML += `<div><div>Latitude</div><div id="userLongitude">${crd.longitude}</div></div>`;
-        userCoordinates.innerHTML += `<button id="search-again-button" class="w-5/6 bg-[#4c0473] p-4 justify-center">SEARCH AGAIN?</button>`;
+        userCoordinates.innerHTML = `<div class="m-2 border-2 border-[#4c0473]"><div class="bg-[#4c0473]">Latitude</div><div id="userLatitude" class="py-2 text-lg text-semibold">${crd.latitude}</div></div>`;
+        userCoordinates.innerHTML += `<div class="m-2 border-2 border-[#4c0473]"><div class="bg-[#4c0473]">Latitude</div><div id="userLongitude" class="py-2 text-lg text-semibold">${crd.longitude}</div></div>`;
+        userCoordinates.innerHTML += `<button id="search-again-button" class="w-5/6 bg-[#4c0473] p-2 justify-center hover:bg-gray-400 hover:text-[#4c0473]">SEARCH AGAIN?</button>`;
         userLatitude = document.querySelector("#userLatitude");
         userLongitude = document.querySelector("#userLongitude");
 
@@ -97,24 +94,24 @@ function displayResults() {
         <div class="flex flex-col px-2 mb-4">
             <div class="justify-center flex bg-gray-400 font-bold text-lg text-[#4c0473]">${station.name}</div>
             <div class="bg-[#4c0473] p-4 flex justify-around text-white ">
-                <div class="">
-                    <div>City: ${station.city}</div><div>Distance: ${station.distance.toFixed(2)} Miles</div>
+                <div class="text-xl font-bold my-auto">
+                    <div class="p-4 text-center">${station.city}</div><div class="p-4 text-center">Distance: ${station.distance.toFixed(2)} Miles</div>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
-                    <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4 text-center" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
+                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4 hover:bg-[#FAA6FF]" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
+                    <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4 text-center hover:bg-[#FAA6FF]" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
                 </div>
             </div>
             <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
-                  <div>
+                  <div class="p-4">
                         <div class="flex-wrap flex justify-center" id="${station.name}div1Head"></div>
                         <div id="${station.name}div1"></div>
                   </div>
-                  <div>
+                  <div class="p-4">
                         <div class="flex-wrap flex justify-center" id="${station.name}div2Head"></div>
                         <div id="${station.name}div2"></div>
                   </div>
-                  <div>
+                  <div class="p-4">
                         <div class="flex-wrap flex justify-center" id="${station.name}div3Head"></div>
                         <div id="${station.name}div3"></div>
                   </div>
@@ -224,10 +221,10 @@ function addFavorite(station) {
 
 function loadFavorites() {
   favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
-  favoriteDiv.innerHTML = `<h3 class="text-center text-[#4c0473]">FAVORITE LOCATIONS</h3>`;
+  favoriteDiv.innerHTML = `<h3 class="text-center text-[#4c0473] text-xl font-bold">FAVORITE LOCATIONS</h3>`;
   favoriteStations.forEach((station) => {
     let favoriteStationEL = document.createElement("a");
-    favoriteStationEL.setAttribute("class", " w-5/6 p-2 bg-[#4c0473] flex my-2 m-auto");
+    favoriteStationEL.setAttribute("class", " w-5/6 p-2 bg-[#4c0473] flex my-2 m-auto justify-center hover:bg-gray-400 hover:text-[#4c0473]");
     favoriteStationEL.setAttribute("href", `https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.lat},+${station.long}/@${station.lat},${station.long}`);
 
     favoriteStationEL.setAttribute("data-lat", station.lat);
@@ -237,28 +234,35 @@ function loadFavorites() {
   });
 }
 function runFilter() {
-  if (rentingBtn.checked === true) {
+  if (rentingBtn.checked === true && numberBikes.value > 0) {
     isRenting = true;
     bikeType = "freeBikes";
     numBikes = numberBikes.value;
-
     displayResults();
-  } else if (returningBtn.checked === true) {
+    questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex hidden");
+    leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 block xl:py-0 p-2 xl:mb-4");
+  } else if (returningBtn.checked === true && numberBikes.value > 0) {
     isRenting = false;
     bikeType = "empty";
     numBikes = numberBikes.value;
     displayResults();
+    questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex hidden");
+    leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 block xl:py-0 p-2 xl:mb-4");
   } else {
-    alert("check something");
+    // ERROR DIV REVEAL
+    errorDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex block");
+
+    // HIDE Question DIV
+    questionDiv.setAttribute("class", "absolute top-24 w-1/5 h-80 bg-[#4c0473] flex hidden");
   }
-  questionDiv.setAttribute("class", "absolute object-center w-4/5 h-80 bg-white flex hidden");
-  leftSide.setAttribute("class", "flex flex-col w-1/5 mb-4 block");
 }
 
 function searchAgain(event) {
   if (event.target.tagName.toLowerCase() === "button") {
-    questionDiv.setAttribute("class", "absolute object-center w-4/5 h-80 bg-white flex block");
-    leftSide.setAttribute("class", "flex flex-col w-1/5 mb-4 hidden");
+    questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex block");
+    errorDiv.setAttribute("class", "absolute top-24 w-1/5 h-80 bg-[#4c0473] flex hidden");
+
+    leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 hidden xl:py-0 p-2 xl:mb-4");
     stationCards.innerHTML = "";
   }
 }
@@ -284,5 +288,6 @@ stationCards.addEventListener("click", function (event) {
 });
 
 enterBtn.addEventListener("click", runFilter);
+startSearchBtn.addEventListener("click", searchAgain);
 userCoordinates.addEventListener("click", searchAgain);
 //anser the cards
