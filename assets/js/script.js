@@ -1,4 +1,5 @@
 //global
+
 let crd = {};
 let userLatitude = [];
 let userLongitude = [];
@@ -6,9 +7,17 @@ let userCoordinates = document.querySelector("#user-coordinates");
 let stationCards = document.querySelector("#station-cards");
 let favoriteDiv = document.querySelector("#favorite-div");
 let stationArray = [];
+let stationArrayFiltered = [];
 let closestStations = [];
-let userAnswers = document.querySelector("#question-div");
+let enterBtn = document.querySelector("#enter-btn");
+let rentingBtn = document.querySelector("#renting-btn");
+let returningBtn = document.querySelector("#returning-btn");
+let numberBikes = document.getElementById("num-bike");
+
+let isRenting = false;
 let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
+let numBikes = 0;
+let bikeType = "empty";
 
 function pullUserCoordinates() {
   userCoordinates.innerHTML = `<div><div>Latitude</div><div id="userLatitude">${crd.latitude}</div></div>`;
@@ -59,8 +68,6 @@ function requestStations() {
         });
 
         // LAST STEP FOR DISPLAY
-        closestStations = stationArray.slice(0, 10);
-        displayResults(crd);
       }
       function error(err) {
         console.warn(`ERROR(${err.code}): ${err.message}`);
@@ -70,6 +77,17 @@ function requestStations() {
     });
 }
 function displayResults() {
+  stationCards.innerHTML = "";
+  stationArrayFiltered = [];
+  stationArray.forEach((station) => {
+    if (station[bikeType] > numBikes) {
+      stationArrayFiltered.push(station);
+      console.log(station);
+    }
+  });
+  console.log(stationArrayFiltered);
+  closestStations = stationArrayFiltered.slice(0, 10);
+
   // Adding each Station to its own Div
   closestStations.forEach((station) => {
     stationCards.innerHTML += ` 
@@ -99,7 +117,7 @@ function displayResults() {
                   </div>
             </div>
         </div>`;
-    if (1 === 1) {
+    if (isRenting === false) {
       if (station.empty !== 0) {
         let bikeSlotDiv1Head = document.getElementById(`${station.name}div1Head`);
         bikeSlotDiv1Head.innerHTML = `<h3 class="text-white w-full text-center">EMPTY SLOTS</h3>`;
@@ -117,7 +135,7 @@ function displayResults() {
         let bikeImage = document.createElement("img");
         bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
         bikeImage.setAttribute("alt", "empty slot");
-        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+        bikeImage.setAttribute("class", "h-6 w-6 mx-1 flex");
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
@@ -139,18 +157,56 @@ function displayResults() {
         bikeSlotDiv.appendChild(bikeImage);
         bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
       }
-    } else if (1 === 0) {
-      [];
+    } else if (isRenting === true) {
+      if (station.empty !== 0) {
+        let bikeSlotDiv1Head = document.getElementById(`${station.name}div3Head`);
+        bikeSlotDiv1Head.innerHTML = `<h3 class="text-white w-full text-center">EMPTY SLOTS</h3>`;
+      }
+      if (station.renting !== 0) {
+        let bikeSlotDiv2Head = document.getElementById(`${station.name}div2Head`);
+        bikeSlotDiv2Head.innerHTML = `<h3 class="text-white w-full text-center">RENTING BIKES</h3>`;
+      }
+      if (station.freeBikes !== 0) {
+        let bikeSlotDiv3Head = document.getElementById(`${station.name}div1Head`);
+        bikeSlotDiv3Head.innerHTML = `<h3 class="text-white w-full text-center">BIKES AVAILABLE</h3>`;
+      }
+      for (let i = 0; i < station.empty; i++) {
+        let bikeSlotDiv = document.getElementById(`${station.name}div3`);
+        let bikeImage = document.createElement("img");
+        bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
+        bikeImage.setAttribute("alt", "empty slot");
+        bikeImage.setAttribute("class", "h-6 w-6 mx-1 flex");
+        bikeSlotDiv.appendChild(bikeImage);
+        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+      }
+      for (let i = 0; i < station.renting; i++) {
+        let bikeSlotDiv = document.getElementById(`${station.name}div2`);
+        let bikeImage = document.createElement("img");
+        bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
+        bikeImage.setAttribute("alt", "renting bikes");
+        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+        bikeSlotDiv.appendChild(bikeImage);
+        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+      }
+      for (let i = 0; i < station.freeBikes; i++) {
+        let bikeSlotDiv = document.getElementById(`${station.name}div1`);
+        let bikeImage = document.createElement("img");
+        bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
+        bikeImage.setAttribute("alt", "free bikes");
+        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+        bikeSlotDiv.appendChild(bikeImage);
+        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+      }
     }
     loadFavorites();
   });
-  console.log(stationArray);
+
   //display results
 
   //createEL
 }
 function addFavorite(station) {
-  let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
+  favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
   console.log(favoriteStations.includes(station));
   console.log(favoriteStations);
   const findStation = favoriteStations.find((st) => st.name === station.name) || [];
@@ -160,9 +216,11 @@ function addFavorite(station) {
     favoriteStations = favoriteStations.slice(0, 5);
     localStorage.setItem("favoriteStations", JSON.stringify(favoriteStations));
   }
+  loadFavorites();
 }
 
 function loadFavorites() {
+  favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
   favoriteDiv.innerHTML = `<h3 class="text-center text-[#4c0473]">FAVORITE LOCATIONS</h3>`;
   favoriteStations.forEach((station) => {
     let favoriteStationEL = document.createElement("a");
@@ -174,6 +232,22 @@ function loadFavorites() {
     favoriteStationEL.innerHTML = station.name;
     favoriteDiv.appendChild(favoriteStationEL);
   });
+}
+function runFilter() {
+  if (rentingBtn.checked === true) {
+    isRenting = true;
+    bikeType = "freeBikes";
+    numBikes = numberBikes.value;
+    console.log(numBikes);
+    displayResults();
+  } else if (returningBtn.checked === true) {
+    isRenting = false;
+    bikeType = "empty";
+    numBikes = numberBikes.value;
+    displayResults();
+  } else {
+    alert("check something");
+  }
 }
 
 function init() {
@@ -195,4 +269,6 @@ stationCards.addEventListener("click", function (event) {
     addFavorite(stationName);
   }
 });
+
+enterBtn.addEventListener("click", runFilter);
 //anser the cards
