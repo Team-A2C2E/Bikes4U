@@ -12,10 +12,16 @@
 
 <body class="bg-slate-900">
     <!-- header -->
-    <header class="justify-center flex bg-gray-400 font-bold text-lg text-[#4c0473]">HEADER GOES HERE</header>
+    <header class="justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4">
+        <img class="w-24 h-24 xl:mx-16 m-auto justify-center flex " src="./assets/img/White_Bike_Outline.png"></img>
+        <div class="flex flex-col">
+            <div class="text-5xl text-center font-bold">BIKES 4 YOU!</div>
+            <div class="text-xl text-center font-bold">FIND A PUBLIC BIKE RENTAL LOCATION CLOSE TO YOUR LOCATION</div>
+        </div>
+    </header>
     <!-- navbar -->
     <!-- /header -->
-    <main class="flex xl:flex-row flex-col justify-center m-auto h-full p-4 xl:items-stretch items-center ">
+    <main class="flex xl:flex-row flex-col justify-center m-auto h-full p-4 xl:items-stretch items-center">
         <!-- form -->
         <!-- coordinate input -->
         <div id="left-side" class="flex flex-col xl:w-1/5 w-3/5 hidden xl:px-0 px-2">
@@ -63,10 +69,17 @@
         <!-- /output cards-->
         <!-- /OutputDiv -->
     </main>
-    <footer>
-        <!-- footer -->
 
+    <!-- footer fixed bottom-0 -->
+    <footer id="footer-div"
+        class="fixed bottom-0 justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full">
+        <img class="w-24 h-24 xl:mx-16 m-auto justify-center flex " src="./assets/img/White_Bike_Outline.png"></img>
+        <div class="flex flex-col">
+            <div class="text-xl text-center font-bold">BIKES 4 YOU!</div>
+            <div class="text-lg text-center font-bold">CREATED BY ANDREW, CASEY, CHRIS & EVAN</div>
+        </div>
     </footer>
+
 </body>
 <script src="./assets/js/script.js"></script>
 

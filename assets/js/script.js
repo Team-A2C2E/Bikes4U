@@ -16,6 +16,7 @@ let returningBtn = document.querySelector("#returning-btn");
 let numberBikes = document.getElementById("num-bike");
 let questionDiv = document.querySelector("#question-div");
 let errorDiv = document.querySelector("#error-div");
+let footerDiv = document.querySelector("#footer-div");
 
 let searchAgainButton = "";
 let leftSide = document.querySelector("#left-side");
@@ -38,7 +39,7 @@ function requestStations() {
       };
       function success(pos) {
         crd = pos.coords;
-        questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex block");
+        questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex block");
 
         userCoordinates.innerHTML = `<div class="m-2 border-2 border-[#4c0473]"><div class="bg-[#4c0473]">Latitude</div><div id="userLatitude" class="py-2 text-lg text-semibold">${crd.latitude}</div></div>`;
         userCoordinates.innerHTML += `<div class="m-2 border-2 border-[#4c0473]"><div class="bg-[#4c0473]">Latitude</div><div id="userLongitude" class="py-2 text-lg text-semibold">${crd.longitude}</div></div>`;
@@ -200,6 +201,7 @@ function displayResults() {
       }
     }
     loadFavorites();
+    footerDiv.setAttribute("class", "justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full");
   });
 
   //display results
@@ -239,29 +241,29 @@ function runFilter() {
     bikeType = "freeBikes";
     numBikes = numberBikes.value;
     displayResults();
-    questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex hidden");
+    questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex hidden");
     leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 block xl:py-0 p-2 xl:mb-4");
   } else if (returningBtn.checked === true && numberBikes.value > 0) {
     isRenting = false;
     bikeType = "empty";
     numBikes = numberBikes.value;
     displayResults();
-    questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex hidden");
+    questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex hidden");
     leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 block xl:py-0 p-2 xl:mb-4");
   } else {
     // ERROR DIV REVEAL
-    errorDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex block");
-
+    errorDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex block");
+    footerDiv.setAttribute("class", "fixed bottom-0 justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full");
     // HIDE Question DIV
-    questionDiv.setAttribute("class", "absolute top-24 w-1/5 h-80 bg-[#4c0473] flex hidden");
+    questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-1/5 h-80 bg-[#4c0473] flex hidden");
   }
 }
 
 function searchAgain(event) {
   if (event.target.tagName.toLowerCase() === "button") {
-    questionDiv.setAttribute("class", "absolute top-24 w-4/5 h-80 bg-[#4c0473] flex block");
-    errorDiv.setAttribute("class", "absolute top-24 w-1/5 h-80 bg-[#4c0473] flex hidden");
-
+    questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex block");
+    errorDiv.setAttribute("class", "absolute xl:top-36 top-56 w-1/5 h-80 bg-[#4c0473] flex hidden");
+    footerDiv.setAttribute("class", "fixed bottom-0 justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full");
     leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 hidden xl:py-0 p-2 xl:mb-4");
     stationCards.innerHTML = "";
   }
