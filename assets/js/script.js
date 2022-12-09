@@ -6,25 +6,30 @@ let userLongitude = [];
 let userCoordinates = document.querySelector("#user-coordinates");
 let stationCards = document.querySelector("#station-cards");
 let favoriteDiv = document.querySelector("#favorite-div");
+let stationName = {};
 let stationArray = [];
 let stationArrayFiltered = [];
 let closestStations = [];
 let enterBtn = document.querySelector("#enter-btn");
 let startSearchBtn = document.querySelector("#start-search-btn");
+let againSearchBtn = document.querySelector("#again-search-btn");
 let rentingBtn = document.querySelector("#renting-btn");
 let returningBtn = document.querySelector("#returning-btn");
 let numberBikes = document.getElementById("num-bike");
 let questionDiv = document.querySelector("#question-div");
 let errorDiv = document.querySelector("#error-div");
 let footerDiv = document.querySelector("#footer-div");
-
+let noSearchDiv = document.querySelector("#no-search-div");
+let hootDiv = document.querySelector("#hoot-div");
 let searchAgainButton = "";
 let leftSide = document.querySelector("#left-side");
 let isRenting = false;
 let favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
 let numBikes = 0;
 let bikeType = "empty";
+let play = document.getElementById("play");
 
+// Grabs Lat Long of User & Creates Array of Station Objects
 function requestStations() {
   let requestURL = "https://api.citybik.es/v2/networks/divvy";
   fetch(requestURL)
@@ -67,8 +72,6 @@ function requestStations() {
         stationArray.sort((locationA, locationB) => {
           return locationA.distance > locationB.distance ? 1 : -1;
         });
-
-        // LAST STEP FOR DISPLAY
       }
       function error(err) {
         console.warn(`ERROR(${err.code}): ${err.message}`);
@@ -77,6 +80,8 @@ function requestStations() {
       navigator.geolocation.getCurrentPosition(success, error, options);
     });
 }
+
+// Displays Results on Screen
 function displayResults() {
   stationCards.innerHTML = "";
   stationArrayFiltered = [];
@@ -87,127 +92,133 @@ function displayResults() {
     }
   });
 
+  // cuts results to just 10
   closestStations = stationArrayFiltered.slice(0, 10);
 
   // Adding each Station to its own Div
-  closestStations.forEach((station) => {
-    stationCards.innerHTML += ` 
-        <div class="flex flex-col px-2 mb-4">
-            <div class="justify-center flex bg-gray-400 font-bold text-lg text-[#4c0473]">${station.name}</div>
-            <div class="bg-[#4c0473] p-4 flex justify-around text-white ">
-                <div class="text-xl font-bold my-auto">
-                    <div class="p-4 text-center">${station.city}</div><div class="p-4 text-center">Distance: ${station.distance.toFixed(2)} Miles</div>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4 hover:bg-[#FAA6FF]" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
-                    <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4 text-center hover:bg-[#FAA6FF]" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
-                </div>
-            </div>
-            <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
-                  <div class="p-4">
-                        <div class="flex-wrap flex justify-center" id="${station.name}div1Head"></div>
-                        <div id="${station.name}div1"></div>
+  if (closestStations.length === 0) {
+    leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 hidden xl:py-0 p-2 xl:mb-4");
+    noSearchDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex block");
+    stationCards.innerHTML = "";
+  } else {
+    closestStations.forEach((station) => {
+      stationCards.innerHTML += ` 
+          <div class="flex flex-col px-2 mb-4">
+              <div class="justify-center text-center flex bg-gray-400 font-bold text-lg text-[#4c0473]">${station.name}</div>
+              <div class="bg-[#4c0473] p-4 flex xl:flex-row flex-col justify-around text-white ">
+                  <div class="text-xl font-bold my-auto">
+                      <div class="p-4 text-center">${station.city}</div><div class="p-4 text-center">Distance: ${station.distance.toFixed(2)} Miles</div>
                   </div>
-                  <div class="p-4">
-                        <div class="flex-wrap flex justify-center" id="${station.name}div2Head"></div>
-                        <div id="${station.name}div2"></div>
+                  <div class="flex flex-col gap-2">
+                      <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4 hover:bg-[#FAA6FF]" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
+                      <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4 text-center hover:bg-[#FAA6FF]" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
                   </div>
-                  <div class="p-4">
-                        <div class="flex-wrap flex justify-center" id="${station.name}div3Head"></div>
-                        <div id="${station.name}div3"></div>
-                  </div>
-            </div>
-        </div>`;
+              </div>
+              <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
+                    <div class="p-4">
+                          <div class="flex-wrap flex justify-center" id="${station.name}div1Head"></div>
+                          <div id="${station.name}div1"></div>
+                    </div>
+                    <div class="p-4">
+                          <div class="flex-wrap flex justify-center" id="${station.name}div2Head"></div>
+                          <div id="${station.name}div2"></div>
+                    </div>
+                    <div class="p-4">
+                          <div class="flex-wrap flex justify-center" id="${station.name}div3Head"></div>
+                          <div id="${station.name}div3"></div>
+                    </div>
+              </div>
+          </div>`;
 
-    if (isRenting === false) {
-      if (station.empty !== 0) {
-        let bikeSlotDiv1Head = document.getElementById(`${station.name}div1Head`);
-        bikeSlotDiv1Head.innerHTML = `<h3 class="text-white w-full text-center">EMPTY SLOTS</h3>`;
+      // loops to add bike Icons in boxes based off renting or returning
+      if (isRenting === false) {
+        if (station.empty !== 0) {
+          let bikeSlotDiv1Head = document.getElementById(`${station.name}div1Head`);
+          bikeSlotDiv1Head.innerHTML = `<h3 class="text-white w-full text-center">EMPTY SLOTS</h3>`;
+        }
+        if (station.renting !== 0) {
+          let bikeSlotDiv2Head = document.getElementById(`${station.name}div2Head`);
+          bikeSlotDiv2Head.innerHTML = `<h3 class="text-white w-full text-center">RENTING BIKES</h3>`;
+        }
+        if (station.freeBikes !== 0) {
+          let bikeSlotDiv3Head = document.getElementById(`${station.name}div3Head`);
+          bikeSlotDiv3Head.innerHTML = `<h3 class="text-white w-full text-center">BIKES AVAILABLE</h3>`;
+        }
+        for (let i = 0; i < station.empty; i++) {
+          let bikeSlotDiv = document.getElementById(`${station.name}div1`);
+          let bikeImage = document.createElement("img");
+          bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
+          bikeImage.setAttribute("alt", "empty slot");
+          bikeImage.setAttribute("class", "h-6 w-6 mx-1 flex");
+          bikeSlotDiv.appendChild(bikeImage);
+          bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+        }
+        for (let i = 0; i < station.renting; i++) {
+          let bikeSlotDiv = document.getElementById(`${station.name}div2`);
+          let bikeImage = document.createElement("img");
+          bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
+          bikeImage.setAttribute("alt", "renting bikes");
+          bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+          bikeSlotDiv.appendChild(bikeImage);
+          bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+        }
+        for (let i = 0; i < station.freeBikes; i++) {
+          let bikeSlotDiv = document.getElementById(`${station.name}div3`);
+          let bikeImage = document.createElement("img");
+          bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
+          bikeImage.setAttribute("alt", "free bikes");
+          bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+          bikeSlotDiv.appendChild(bikeImage);
+          bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+        }
+      } else if (isRenting === true) {
+        if (station.empty !== 0) {
+          let bikeSlotDiv1Head = document.getElementById(`${station.name}div3Head`);
+          bikeSlotDiv1Head.innerHTML = `<h3 class="text-white w-full text-center">EMPTY SLOTS</h3>`;
+        }
+        if (station.renting !== 0) {
+          let bikeSlotDiv2Head = document.getElementById(`${station.name}div2Head`);
+          bikeSlotDiv2Head.innerHTML = `<h3 class="text-white w-full text-center">RENTING BIKES</h3>`;
+        }
+        if (station.freeBikes !== 0) {
+          let bikeSlotDiv3Head = document.getElementById(`${station.name}div1Head`);
+          bikeSlotDiv3Head.innerHTML = `<h3 class="text-white w-full text-center">BIKES AVAILABLE</h3>`;
+        }
+        for (let i = 0; i < station.empty; i++) {
+          let bikeSlotDiv = document.getElementById(`${station.name}div3`);
+          let bikeImage = document.createElement("img");
+          bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
+          bikeImage.setAttribute("alt", "empty slot");
+          bikeImage.setAttribute("class", "h-6 w-6 mx-1 flex");
+          bikeSlotDiv.appendChild(bikeImage);
+          bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+        }
+        for (let i = 0; i < station.renting; i++) {
+          let bikeSlotDiv = document.getElementById(`${station.name}div2`);
+          let bikeImage = document.createElement("img");
+          bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
+          bikeImage.setAttribute("alt", "renting bikes");
+          bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+          bikeSlotDiv.appendChild(bikeImage);
+          bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+        }
+        for (let i = 0; i < station.freeBikes; i++) {
+          let bikeSlotDiv = document.getElementById(`${station.name}div1`);
+          let bikeImage = document.createElement("img");
+          bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
+          bikeImage.setAttribute("alt", "free bikes");
+          bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
+          bikeSlotDiv.appendChild(bikeImage);
+          bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
+        }
       }
-      if (station.renting !== 0) {
-        let bikeSlotDiv2Head = document.getElementById(`${station.name}div2Head`);
-        bikeSlotDiv2Head.innerHTML = `<h3 class="text-white w-full text-center">RENTING BIKES</h3>`;
-      }
-      if (station.freeBikes !== 0) {
-        let bikeSlotDiv3Head = document.getElementById(`${station.name}div3Head`);
-        bikeSlotDiv3Head.innerHTML = `<h3 class="text-white w-full text-center">BIKES AVAILABLE</h3>`;
-      }
-      for (let i = 0; i < station.empty; i++) {
-        let bikeSlotDiv = document.getElementById(`${station.name}div1`);
-        let bikeImage = document.createElement("img");
-        bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
-        bikeImage.setAttribute("alt", "empty slot");
-        bikeImage.setAttribute("class", "h-6 w-6 mx-1 flex");
-        bikeSlotDiv.appendChild(bikeImage);
-        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
-      }
-      for (let i = 0; i < station.renting; i++) {
-        let bikeSlotDiv = document.getElementById(`${station.name}div2`);
-        let bikeImage = document.createElement("img");
-        bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
-        bikeImage.setAttribute("alt", "renting bikes");
-        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        bikeSlotDiv.appendChild(bikeImage);
-        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
-      }
-      for (let i = 0; i < station.freeBikes; i++) {
-        let bikeSlotDiv = document.getElementById(`${station.name}div3`);
-        let bikeImage = document.createElement("img");
-        bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
-        bikeImage.setAttribute("alt", "free bikes");
-        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        bikeSlotDiv.appendChild(bikeImage);
-        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
-      }
-    } else if (isRenting === true) {
-      if (station.empty !== 0) {
-        let bikeSlotDiv1Head = document.getElementById(`${station.name}div3Head`);
-        bikeSlotDiv1Head.innerHTML = `<h3 class="text-white w-full text-center">EMPTY SLOTS</h3>`;
-      }
-      if (station.renting !== 0) {
-        let bikeSlotDiv2Head = document.getElementById(`${station.name}div2Head`);
-        bikeSlotDiv2Head.innerHTML = `<h3 class="text-white w-full text-center">RENTING BIKES</h3>`;
-      }
-      if (station.freeBikes !== 0) {
-        let bikeSlotDiv3Head = document.getElementById(`${station.name}div1Head`);
-        bikeSlotDiv3Head.innerHTML = `<h3 class="text-white w-full text-center">BIKES AVAILABLE</h3>`;
-      }
-      for (let i = 0; i < station.empty; i++) {
-        let bikeSlotDiv = document.getElementById(`${station.name}div3`);
-        let bikeImage = document.createElement("img");
-        bikeImage.setAttribute("src", "./assets/img/Black_Bike.png");
-        bikeImage.setAttribute("alt", "empty slot");
-        bikeImage.setAttribute("class", "h-6 w-6 mx-1 flex");
-        bikeSlotDiv.appendChild(bikeImage);
-        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
-      }
-      for (let i = 0; i < station.renting; i++) {
-        let bikeSlotDiv = document.getElementById(`${station.name}div2`);
-        let bikeImage = document.createElement("img");
-        bikeImage.setAttribute("src", "./assets/img/Red_Bike.png");
-        bikeImage.setAttribute("alt", "renting bikes");
-        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        bikeSlotDiv.appendChild(bikeImage);
-        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
-      }
-      for (let i = 0; i < station.freeBikes; i++) {
-        let bikeSlotDiv = document.getElementById(`${station.name}div1`);
-        let bikeImage = document.createElement("img");
-        bikeImage.setAttribute("src", "./assets/img/Green_Bike.png");
-        bikeImage.setAttribute("alt", "free bikes");
-        bikeImage.setAttribute("class", " h-6 w-6 mx-1 flex");
-        bikeSlotDiv.appendChild(bikeImage);
-        bikeSlotDiv.setAttribute("class", "flex-wrap flex bg-[#FAA6FF] justify-center p-3");
-      }
-    }
-    loadFavorites();
-    footerDiv.setAttribute("class", "justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full");
-  });
-
-  //display results
-
-  //createEL
+      loadFavorites();
+      footerDiv.setAttribute("class", "justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full block");
+    });
+  }
 }
+
+// adds Favorites to Local Storage
 function addFavorite(station) {
   favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
 
@@ -221,12 +232,13 @@ function addFavorite(station) {
   loadFavorites();
 }
 
+// Loads favorites on screen (up to 5)
 function loadFavorites() {
   favoriteStations = JSON.parse(localStorage.getItem("favoriteStations")) || [];
   favoriteDiv.innerHTML = `<h3 class="text-center text-[#4c0473] text-xl font-bold">FAVORITE LOCATIONS</h3>`;
   favoriteStations.forEach((station) => {
     let favoriteStationEL = document.createElement("a");
-    favoriteStationEL.setAttribute("class", " w-5/6 p-2 bg-[#4c0473] flex my-2 m-auto justify-center hover:bg-gray-400 hover:text-[#4c0473]");
+    favoriteStationEL.setAttribute("class", " w-5/6 p-2 bg-[#4c0473] flex my-2 m-auto justify-center hover:bg-gray-400 hover:text-[#4c0473] text-center");
     favoriteStationEL.setAttribute("href", `https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.lat},+${station.long}/@${station.lat},${station.long}`);
 
     favoriteStationEL.setAttribute("data-lat", station.lat);
@@ -235,49 +247,55 @@ function loadFavorites() {
     favoriteDiv.appendChild(favoriteStationEL);
   });
 }
+
+// Filters Array of Station Objects based on number of bikes requested
 function runFilter() {
   if (rentingBtn.checked === true && numberBikes.value > 0) {
     isRenting = true;
     bikeType = "freeBikes";
     numBikes = numberBikes.value;
-    displayResults();
     questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex hidden");
     leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 block xl:py-0 p-2 xl:mb-4");
+    displayResults();
   } else if (returningBtn.checked === true && numberBikes.value > 0) {
     isRenting = false;
     bikeType = "empty";
     numBikes = numberBikes.value;
-    displayResults();
     questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex hidden");
     leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 block xl:py-0 p-2 xl:mb-4");
+    displayResults();
+  } else if (numberBikes.value.toLowerCase() === "duck" || numberBikes.value.toLowerCase() === "ducks") {
+    hootDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex block");
+    play.play();
   } else {
     // ERROR DIV REVEAL
     errorDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex block");
-    footerDiv.setAttribute("class", "fixed bottom-0 justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full");
     // HIDE Question DIV
     questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-1/5 h-80 bg-[#4c0473] flex hidden");
   }
 }
 
+// Puts Search Div back on screen
 function searchAgain(event) {
   if (event.target.tagName.toLowerCase() === "button") {
     questionDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex block");
     errorDiv.setAttribute("class", "absolute xl:top-36 top-56 w-1/5 h-80 bg-[#4c0473] flex hidden");
-    footerDiv.setAttribute("class", "fixed bottom-0 justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full");
     leftSide.setAttribute("class", "flex flex-col xl:w-1/5 w-3/5 hidden xl:py-0 p-2 xl:mb-4");
+    noSearchDiv.setAttribute("class", "absolute xl:top-36 top-56 w-4/5 h-80 bg-[#4c0473] flex hidden");
+    footerDiv.setAttribute("class", "justify-center flex xl:flex-row flex-col bg-gray-400 font-bold text-lg text-[#4c0473] py-4 w-full hidden");
+
     stationCards.innerHTML = "";
   }
 }
 
+// Runs on Load
 function init() {
   requestStations();
-  //show favorites
-  //display 10 stations
 }
 
-init();
-let stationName = {};
 //event listeners
+init();
+
 stationCards.addEventListener("click", function (event) {
   event.preventDefault();
 
@@ -291,5 +309,5 @@ stationCards.addEventListener("click", function (event) {
 
 enterBtn.addEventListener("click", runFilter);
 startSearchBtn.addEventListener("click", searchAgain);
+againSearchBtn.addEventListener("click", searchAgain);
 userCoordinates.addEventListener("click", searchAgain);
-//anser the cards
