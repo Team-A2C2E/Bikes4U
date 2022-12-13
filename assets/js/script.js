@@ -88,7 +88,6 @@ function displayResults() {
   stationArray.forEach((station) => {
     if (station[bikeType] > numBikes) {
       stationArrayFiltered.push(station);
-      console.log(station);
     }
   });
 
@@ -111,7 +110,7 @@ function displayResults() {
                   </div>
                   <div class="flex flex-col gap-2">
                       <button class="bg-gray-400 font-bold text-lg text-[#4c0473] p-4 hover:bg-[#FAA6FF]" data-long="${station.longitude}" data-lat="${station.latitude}" data-station="${station.name}">ADD AS FAVORITE</button>
-                      <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4 text-center hover:bg-[#FAA6FF]" onclick="window.location = 'https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}'">NAVIGATE</a>
+                      <a class="bg-gray-400 cursor-pointer font-bold text-lg text-[#4c0473] p-4 text-center hover:bg-[#FAA6FF]" onclick="window.open('https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.latitude},+${station.longitude}/@${station.latitude},${station.longitude}')">NAVIGATE</a>
                   </div>
               </div>
               <div class="flex justify-evenly flex-col xl:flex-row bg-[#4c0473] w-100 py-4">
@@ -240,7 +239,7 @@ function loadFavorites() {
     let favoriteStationEL = document.createElement("a");
     favoriteStationEL.setAttribute("class", " w-5/6 p-2 bg-[#4c0473] flex my-2 m-auto justify-center hover:bg-gray-400 hover:text-[#4c0473] text-center");
     favoriteStationEL.setAttribute("href", `https://www.google.com/maps/dir/${userLatitude.innerHTML},+${userLongitude.innerHTML}/${station.lat},+${station.long}/@${station.lat},${station.long}`);
-
+    favoriteStationEL.setAttribute("target", "_blank");
     favoriteStationEL.setAttribute("data-lat", station.lat);
     favoriteStationEL.setAttribute("data-long", station.long);
     favoriteStationEL.innerHTML = station.name;
